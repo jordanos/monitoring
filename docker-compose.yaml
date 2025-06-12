@@ -1,9 +1,8 @@
 version: "3.8"
 
 networks:
-  fx_portal_backend_fx-network:
-    name: fx_portal_backend_fx-network
-    external: true
+  monitoring:
+    driver: bridge
 
 volumes:
   prometheus-data:
@@ -24,7 +23,7 @@ services:
       - ./prometheus/config/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
       - prometheus-data:/prometheus
     networks:
-      - fx_portal_backend_fx-network
+      - monitoring
   grafana:
     image: grafana/grafana-oss:latest
     restart: unless-stopped
@@ -34,7 +33,7 @@ services:
     volumes:
       - grafana-data:/var/lib/grafana
     networks:
-      - fx_portal_backend_fx-network
+      - monitoring
   node-exporter:
     image: quay.io/prometheus/node-exporter:v1.5.0
     container_name: node-exporter
@@ -44,7 +43,7 @@ services:
     volumes:
       - /:/host:ro,rslave
     networks:
-      - fx_portal_backend_fx-network
+      - monitoring
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.47.0
     container_name: cadvisor
@@ -58,7 +57,7 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
     networks:
-      - fx_portal_backend_fx-network
+      - monitoring
     devices:
       - /dev/kmsg
     privileged: true
@@ -71,6 +70,4 @@ services:
   #   expose:
   #     - 9113
   #   networks:
-  #     - fx_portal_backend_fx-network
-  #   depends_on:
-  #     - prometheus
+  #     - monitoring
